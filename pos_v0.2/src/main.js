@@ -1,16 +1,10 @@
 //TODO: Please write code in this file.
 function printInventory(inputs) {
-	var allItemInfo = loadAllItems();
+	var allItemInfo = countProduct(inputs);
+	printResult(allItemInfo);
+}
 
-	for (var i = 0; i < inputs.length; i++) {
-		for (var j = 0; j < allItemInfo.length; j++) {
-			if (allItemInfo[j].barcode == inputs[i]) {
-				allItemInfo[j].count = (allItemInfo[j].hasOwnProperty('count'))? allItemInfo[j].count+1 : 1;
-				break;
-			}
-		};
-	}
-
+function printResult(allItemInfo) {
 	var sum = 0;
     var resultString = '***<没钱赚商店>购物清单***';
 
@@ -26,6 +20,21 @@ function printInventory(inputs) {
     resultString += '\n**********************';
 
     console.log(resultString);
+}
+
+function countProduct(inputs) {
+	var allItemInfo = loadAllItems();
+
+	for (var i = 0; i < inputs.length; i++) {
+		for (var j = 0; j < allItemInfo.length; j++) {
+			if (allItemInfo[j].barcode == inputs[i]) {
+				allItemInfo[j].count = (allItemInfo[j].hasOwnProperty('count'))? allItemInfo[j].count+1 : 1;
+				break;
+			}
+		};
+	}
+
+	return allItemInfo;
 }
 
 function getItemMessage(item) {
