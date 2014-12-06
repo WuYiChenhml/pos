@@ -20,7 +20,6 @@ function printResult(allItemInfo) {
     }
 
     resultString += freeString;
-
     resultString += '\n----------------------\n总计：' + sum.toFixed(2) + '(元)';
     resultString += '\n节省：' + free.toFixed(2) + '(元)';
     resultString += '\n**********************';
@@ -63,8 +62,7 @@ function checkIfInFree(barcode) {
         if (promotions[i].type == IN_FREE_TYPE &&
             ifContains(promotions[i].barcodes, barcode))
             return true;
-    }
-    ;
+    };
     return false;
 }
 
@@ -72,8 +70,7 @@ function ifContains(dataSet, oneData) {
     for (var i = 0; i < dataSet.length; i++) {
         if (dataSet[i] == oneData)
             return true;
-    }
-    ;
+    };
     return false;
 }
 
@@ -99,4 +96,77 @@ function getItemFreeMessage(item) {
         return '';
     return '\n名称：' + item.name +
         '，数量：' + item.freeCount + item.unit;
+}
+
+
+function Item(item) {
+    this.name = item.name;
+    this.barcode = item.barcode;
+    this.unit = item.unit;
+    this.price = item.price;
+    this.count = 1;
+    this.free = 0;
+
+    this.checkBarcode = function(barcode) {
+        if (this.barcode == barcode ||
+            this.barcode == barcode.substr(0, this.barcode.length)) {
+            return true;
+        }
+        return false;
+    }
+
+    this.toString = function() {
+        return '\n名称：' + this.name +
+            '，数量：' + this.count + this.unit +
+            '，单价：' + this.price.toFixed(2) +
+            '(元)，小计：' + this.getCost().toFixed(2) + '(元)';
+    }
+
+    this.getFreeMessage = function() {
+        this.calculateFree();
+        if (this.free <= 0)
+            return '';
+        return '\n名称：' + item.name +
+            '，数量：' + item.freeCount + item.unit;
+    }
+
+    this.addCount = function(barcode) {
+        if (this.barcode == barcode)
+            this.count++;
+        else if (this.barcode == barcode.substr(0, this.barcode.length)) {
+            var positionOfBar = barcode.lastIndexOf('-');
+            this.count += parseInt(barcode.substring(positionOfBar + 1, barcode.length));
+        }
+    }
+
+    this.calculateFree = function() {
+        if (flag && this.count > 2) {
+            var freeCount = Math.trunc(this.count / 3);
+            this.free = this.price * freeCount;
+            this.freeCount = freeCount;
+            return this.price * (this.count - Math.trunc(this.count / 3));
+        }
+    }
+    return this.price * this.count;
+}
+
+function checkIfInFree() {
+    var promotions = loadPromotions();
+    var IN_FREE_TYPE = 'BUY_TWO_GET_ONE_FREE';
+    for (var i = 0; i < promotions.length; i++) {
+        if (promotions[i].type == IN_FREE_TYPE &&
+            ifContains(promotions[i].barcodes, this.barcode)) {
+            flag = true;
+            break;
+        }
+    }
+}
+
+
+function ifContains(dataSet, oneData) {
+    for (var i = 0; i < dataSet.length; i++) {
+        if (dataSet[i] == oneData)
+            return true;
+    }
+    return false;
 }
