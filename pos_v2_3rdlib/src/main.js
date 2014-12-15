@@ -1,9 +1,8 @@
 function printInventory(inputs) {
     var items = loadAllItems();
     count_goods(inputs, items);
-    var goods_statistics = calculate_promotion(items, loadPromotions());
-    var receipt = generate_receipt(goods_statistics);
-    console.log(receipt);
+    calculate_promotion(items, loadPromotions());
+    console.log(generate_receipt(items));
 }
 
 function count_goods(inputs, items) {
@@ -27,6 +26,51 @@ function calculate_promotion(items, promotions) {
     });
 }
 
-function generate_receipt(goods_statistics) {
+function generate_receipt(items) {
+    var dateDigitToString = function (num) {
+        return num < 10 ? '0' + num : num;
+    };
+    var currentDate = new Date(),
+        year = dateDigitToString(currentDate.getFullYear()),
+        month = dateDigitToString(currentDate.getMonth() + 1),
+        date = dateDigitToString(currentDate.getDate()),
+        hour = dateDigitToString(currentDate.getHours()),
+        minute = dateDigitToString(currentDate.getMinutes()),
+        second = dateDigitToString(currentDate.getSeconds()),
+        formattedDateString = year + '年' + month + '月' + date + '日 ' + hour + ':' + minute + ':' + second;
 
+    var expectText =
+        '***<没钱赚商店>购物清单***\n' +
+        '打印时间：' + formattedDateString + '\n' +
+        '----------------------\n';
+
+    _.forEach(_.filter(items, function (item) {
+        return item.count;
+    }), function (item) {
+        expectText += '名称：'+item.name+'，数量：'+item.count+item.unit+'，单价：'+item.price.toFixed(2)+'(元)，小计：'+((item.count-item.freeCount)*item.price).toFixed(2)+'(元)\n';
+    });
+    expectText +=
+        '----------------------\n' +
+        '挥泪赠送商品：\n';
+    _.forEach(_.filter(items, function (item) {
+        return item.freeCount;
+    }), function (item) {
+        expectText += '名称：'+item.name+'，数量：'+item.freeCount+item.unit+'\n';
+    });
+
+    var sum = 0, free_sum = 0;
+    _.forEach(_.filter(items, function (item) {
+        return item.count;
+    }), function (item) {
+        sum += (item.count-item.freeCount)*item.price;
+        free_sum += item.freeCount*item.price
+    });
+
+    expectText +=
+        '----------------------\n' +
+        '总计：'+sum.toFixed(2)+'(元)\n' +
+        '节省：'+free_sum.toFixed(2)+'(元)\n' +
+        '**********************';
+
+    return expectText;
 }
